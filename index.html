@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Illugo — Comic & Webtoon Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f5f0e8;
+    --paper-dark: #ede7d9;
+    --accent: #c8392b;
+    --accent-dark: #9b2920;
+    --gold: #c9a84c;
+    --mid: #3a3530;
+    --light-ink: #1e1a16;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 4rem;
+    border-bottom: 1px solid rgba(245,240,232,0.08);
+    backdrop-filter: blur(12px);
+    background: rgba(10,10,10,0.7);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--paper);
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    color: var(--accent);
+  }
+
+  nav ul {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  nav ul a {
+    color: rgba(245,240,232,0.6);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--paper); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: var(--paper) !important;
+    padding: 0.5rem 1.2rem !important;
+    border-radius: 2px;
+  }
+
+  .nav-cta:hover { background: var(--accent-dark); color: var(--paper) !important; }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10rem 4rem 6rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 6vw, 6rem);
+    font-weight: 900;
+    line-height: 1.0;
+    color: var(--paper);
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    letter-spacing: 0.18em;
+    color: rgba(245,240,232,0.35);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.65);
+    max-width: 420px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--paper);
+    padding: 0.85rem 2rem;
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); }
+
+  .btn-secondary {
+    border: 1px solid rgba(245,240,232,0.25);
+    color: var(--paper);
+    padding: 0.85rem 2rem;
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 2px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--paper); transform: translateY(-2px); }
+
+  /* Hero Right — Panel Grid Decoration */
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-template-rows: 2fr 1fr 2fr;
+    gap: 3px;
+    background: #111;
+    opacity: 0.85;
+  }
+
+  .panel {
+    background: var(--light-ink);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(200,57,43,0.08) 100%);
+  }
+
+  .panel-1 {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    background: linear-gradient(160deg, #1a1510 0%, #0d0b08 100%);
+  }
+
+  .panel-2 {
+    grid-column: 2;
+    grid-row: 1;
+    background: linear-gradient(160deg, #160f0f 0%, #0d0808 100%);
+  }
+
+  .panel-3 {
+    grid-column: 2;
+    grid-row: 2;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .panel-3-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.8);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  .panel-4 {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    background: linear-gradient(to right, #12100e, #1a1510);
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .panel-tag {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* Speedlines decoration */
+  .speedlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      88deg,
+      transparent,
+      transparent 18px,
+      rgba(245,240,232,0.012) 18px,
+      rgba(245,240,232,0.012) 19px
+    );
+    pointer-events: none;
+  }
+
+  /* ─── SECTION SHARED ─── */
+  section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(245,240,232,0.1);
+    max-width: 60px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--paper);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ─── ABOUT ─── */
+  #about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    border-top: 1px solid rgba(245,240,232,0.08);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 7rem 4rem;
+  }
+
+  .about-text p {
+    color: rgba(245,240,232,0.65);
+    line-height: 1.9;
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-text p strong {
+    color: var(--paper);
+    font-weight: 500;
+  }
+
+  .about-quote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .about-quote p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem !important;
+    color: rgba(245,240,232,0.8) !important;
+    line-height: 1.6 !important;
+  }
+
+  .about-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+
+  .stat-box {
+    background: var(--light-ink);
+    padding: 2rem 1.5rem;
+    border: 1px solid rgba(245,240,232,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .stat-box:hover::before { transform: scaleX(1); }
+
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--paper);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-number span { color: var(--accent); }
+
+  .stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+  }
+
+  .stat-box.accent-box {
+    background: var(--accent);
+    grid-column: 1 / 3;
+  }
+
+  .stat-box.accent-box .stat-number,
+  .stat-box.accent-box .stat-label { color: var(--paper); }
+  .stat-box.accent-box .stat-label { opacity: 0.75; }
+
+  /* ─── SERVICES ─── */
+  #services {
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .services-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+    align-items: end;
+  }
+
+  .services-desc {
+    color: rgba(245,240,232,0.55);
+    line-height: 1.8;
+    font-size: 0.9rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+
+  .service-card {
+    background: var(--light-ink);
+    padding: 2.5rem 2rem;
+    border: 1px solid rgba(245,240,232,0.05);
+    position: relative;
+    transition: background 0.3s;
+    cursor: default;
+  }
+
+  .service-card:hover {
+    background: #1e1a16;
+  }
+
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: rgba(245,240,232,0.06);
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    line-height: 1;
+  }
+
+  .service-icon {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .service-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 0.8rem;
+  }
+
+  .service-desc {
+    font-size: 0.85rem;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.7;
+  }
+
+  .service-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* ─── PORTFOLIO ─── */
+  #portfolio {
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+
+  .portfolio-filter {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .filter-btn {
+    background: none;
+    border: 1px solid rgba(245,240,232,0.15);
+    color: rgba(245,240,232,0.5);
+    padding: 0.4rem 1rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover,
+  .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--paper);
+    background: rgba(200,57,43,0.1);
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 3px;
+  }
+
+  .portfolio-item {
+    background: var(--light-ink);
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .portfolio-item:first-child {
+    grid-column: 1 / 3;
+    aspect-ratio: 16/9;
+  }
+
+  .portfolio-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .portfolio-item:nth-child(1) .portfolio-placeholder {
+    background: linear-gradient(135deg, #1a1208 0%, #2a1f10 50%, #1a1208 100%);
+  }
+  .portfolio-item:nth-child(2) .portfolio-placeholder {
+    background: linear-gradient(135deg, #0d0f18 0%, #141828 50%, #0d0f18 100%);
+  }
+  .portfolio-item:nth-child(3) .portfolio-placeholder {
+    background: linear-gradient(135deg, #120d0d 0%, #1e1010 50%, #120d0d 100%);
+  }
+  .portfolio-item:nth-child(4) .portfolio-placeholder {
+    background: linear-gradient(135deg, #0d1210 0%, #111e18 50%, #0d1210 100%);
+  }
+
+  .portfolio-icon {
+    font-size: 2rem;
+    opacity: 0.2;
+  }
+
+  .portfolio-hint {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.2);
+  }
+
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,10,0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+
+  .portfolio-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 0.3rem;
+  }
+
+  .portfolio-cat {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* ─── CONTACT ─── */
+  #contact {
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .contact-left .section-title {
+    margin-bottom: 1rem;
+  }
+
+  .contact-left p {
+    color: rgba(245,240,232,0.55);
+    line-height: 1.8;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(245,240,232,0.7);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: color 0.2s;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(245,240,232,0.07);
+  }
+
+  .contact-link:hover { color: var(--paper); }
+
+  .contact-link-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--light-ink);
+    border: 1px solid rgba(245,240,232,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .contact-right {
+    background: var(--light-ink);
+    border: 1px solid rgba(245,240,232,0.07);
+    padding: 2.5rem;
+    border-radius: 2px;
+  }
+
+  .contact-status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .contact-field {
+    margin-bottom: 1.2rem;
+  }
+
+  .contact-field label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-field input,
+  .contact-field textarea,
+  .contact-field select {
+    width: 100%;
+    background: rgba(245,240,232,0.04);
+    border: 1px solid rgba(245,240,232,0.1);
+    color: var(--paper);
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .contact-field input:focus,
+  .contact-field textarea:focus,
+  .contact-field select:focus {
+    border-color: var(--accent);
+  }
+
+  .contact-field textarea { resize: vertical; min-height: 100px; }
+  .contact-field select option { background: var(--light-ink); }
+
+  .btn-submit {
+    width: 100%;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .btn-submit:hover { background: var(--accent-dark); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding: 2.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.3);
+  }
+
+  .footer-logo span { color: var(--accent); opacity: 0.6; }
+
+  .footer-copy {
+    font-size: 0.72rem;
+    color: rgba(245,240,232,0.25);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-socials {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  .footer-socials a {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-socials a:hover { color: var(--paper); }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── DIVIDER LINE ─── */
+  .full-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(200,57,43,0.4), transparent);
+  }
+
+  /* ─── MOBILE HAMBURGER ─── */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .nav-hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--paper);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+
+  .nav-mobile {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,0.98);
+    z-index: 99;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .nav-mobile.open { display: flex; }
+
+  .nav-mobile a {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--paper);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .nav-mobile a:hover { color: var(--accent); }
+
+  .nav-mobile-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--paper);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* ─── RESPONSIVE — TABLET (768px) ─── */
+  @media (max-width: 768px) {
+
+    /* Nav */
+    nav {
+      padding: 1rem 1.5rem;
+    }
+
+    nav ul { display: none; }
+    .nav-hamburger { display: flex; }
+
+    /* Hero */
+    #hero {
+      grid-template-columns: 1fr;
+      min-height: 100vh;
+    }
+
+    .hero-left {
+      padding: 7rem 1.5rem 3rem;
+      text-align: center;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      justify-content: center;
+    }
+
+    .hero-desc { max-width: 100%; }
+
+    .hero-buttons {
+      justify-content: center;
+    }
+
+    .hero-right {
+      height: 40vh;
+    }
+
+    /* About */
+    #about {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      padding: 4rem 1.5rem;
+    }
+
+    .about-visual {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Services */
+    #services {
+      padding: 4rem 1.5rem;
+    }
+
+    .services-header {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* Portfolio */
+    #portfolio {
+      padding: 4rem 1.5rem;
+    }
+
+    .portfolio-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .portfolio-filter {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .portfolio-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pf-featured {
+      grid-column: 1 / 3 !important;
+    }
+
+    /* Comics section */
+    #comics {
+      padding: 4rem 1.5rem !important;
+    }
+
+    #comics > div:nth-child(2) {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Contact */
+    #contact {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      padding: 4rem 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    /* Team grid */
+    #team > div:nth-child(2) {
+      grid-template-columns: 1fr !important;
+    }
+
+    #team {
+      padding: 4rem 1.5rem !important;
+    }
+  }
+
+  /* ─── RESPONSIVE — MOBILE (480px) ─── */
+  @media (max-width: 480px) {
+
+    /* Nav */
+    nav { padding: 1rem; }
+
+    .nav-logo { font-size: 1.4rem; }
+
+    /* Hero */
+    .hero-left { padding: 6rem 1rem 2rem; }
+
+    .hero-title { font-size: 2.8rem !important; }
+
+    .hero-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .btn-primary, .btn-secondary {
+      text-align: center;
+      width: 100%;
+    }
+
+    .hero-right { height: 35vh; }
+
+    /* About */
+    #about { padding: 3rem 1rem; }
+
+    .about-visual {
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .stat-number { font-size: 2rem; }
+
+    /* Services */
+    #services { padding: 3rem 1rem; }
+
+    .service-card { padding: 1.5rem 1.2rem; }
+
+    /* Portfolio */
+    #portfolio { padding: 3rem 1rem; }
+
+    .portfolio-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pf-featured {
+      grid-column: 1 !important;
+      aspect-ratio: 3/4 !important;
+    }
+
+    .filter-btn {
+      font-size: 0.65rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    /* Comics */
+    #comics { padding: 3rem 1rem !important; }
+
+    /* Contact */
+    #contact { padding: 3rem 1rem; }
+
+    .contact-right { padding: 1.5rem; }
+
+    /* Footer */
+    footer { padding: 1.5rem 1rem; }
+
+    .footer-socials { gap: 0.8rem; }
+
+    /* Team */
+    #team { padding: 3rem 1rem !important; }
+
+    /* Lightbox */
+    #lightbox { padding: 1rem; }
+
+    #lbImg {
+      max-width: 95vw;
+      max-height: 70vh;
+    }
+
+    /* Section padding global */
+    section { padding: 3rem 1rem; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">ILLU<span>GO</span></a>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#comics">Comics</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#contact" class="nav-cta">Hire Us</a></li>
+  </ul>
+  <div class="nav-hamburger" onclick="document.getElementById('mobileNav').classList.add('open')">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="nav-mobile" id="mobileNav">
+  <button class="nav-mobile-close" onclick="document.getElementById('mobileNav').classList.remove('open')">✕</button>
+  <a href="#about" onclick="document.getElementById('mobileNav').classList.remove('open')">About</a>
+  <a href="#services" onclick="document.getElementById('mobileNav').classList.remove('open')">Services</a>
+  <a href="#portfolio" onclick="document.getElementById('mobileNav').classList.remove('open')">Portfolio</a>
+  <a href="#comics" onclick="document.getElementById('mobileNav').classList.remove('open')">Comics</a>
+  <a href="#team" onclick="document.getElementById('mobileNav').classList.remove('open')">Team</a>
+  <a href="#contact" onclick="document.getElementById('mobileNav').classList.remove('open')" style="color:var(--accent);">Hire Us →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero" style="padding:0; max-width:100%; margin:0;">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Comic & Webtoon Studio</div>
+    <h1 class="hero-title">Stories<br><em>Crafted</em><br>with Ink.</h1>
+    <p class="hero-sub">Manga · Manhwa · Art Direction</p>
+    <p class="hero-desc">
+      At Illugo, we bring your stories to life with precision and care — from storyboard to final panel. Every line drawn with intention. Every page delivered with pride.
+    </p>
+    <div class="hero-buttons">
+      <a href="#portfolio" class="btn-primary">View Our Work</a>
+      <a href="#contact" class="btn-secondary">Start a Project</a>
+    </div>
+  </div>
+
+  <div class="hero-right" style="position:relative; overflow:hidden;">
+    <!-- Hero Artwork -->
+    <img 
+      src="hero.jpg" 
+      alt="Illugo Studio — Comic Artwork" 
+      style="width:100%; height:100%; object-fit:cover; object-position: center top; display:block;"
+    >
+    <!-- Gradient overlay kiri agar blend dengan hero-left -->
+    <div style="position:absolute; inset:0; background: linear-gradient(to right, var(--ink) 0%, transparent 25%);"></div>
+    <!-- Gradient overlay bawah -->
+    <div style="position:absolute; inset:0; background: linear-gradient(to top, var(--ink) 0%, transparent 30%);"></div>
+    <!-- Badge currently open -->
+    <div style="position:absolute; bottom:2rem; left:2rem; display:flex; align-items:center; gap:0.8rem; background:rgba(10,10,10,0.75); backdrop-filter:blur(8px); border:1px solid rgba(245,240,232,0.1); padding:0.7rem 1.2rem; border-radius:2px;">
+      <div style="width:8px; height:8px; background:#e08c00; border-radius:50%;"></div>
+      <div>
+        <div style="font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--paper); font-weight:500;">Commissions Closed</div>
+        <div style="font-size:0.72rem; color:rgba(245,240,232,0.4); margin-top:0.15rem;">Portfolio & inquiries still welcome</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ABOUT -->
+<div id="about">
+  <div class="about-text fade-up">
+    <div class="section-label">About Illugo</div>
+    <h2 class="section-title">We don't just<br>draw. We craft.</h2>
+    <p>The name <strong>Illugo</strong> is rooted in the Korean <strong>일고 (Il-go)</strong> — meaning <em>"Lofty Work."</em> Our first studio. Our first commitment. To illustration that moves forward.</p>
+    <p>Our small but highly skilled team specializes in manga and manhwa-style illustration, bringing expressive characters, dynamic panels, and polished storytelling to every project we take on. From storyboarding and art direction to inking and professional coloring, we handle the full pipeline — adapting to your story's visual language so every panel feels exactly as you imagined it.</p>
+    <div class="about-quote">
+      <p>"We don't just deliver files. We deliver work you're proud to publish."</p>
+    </div>
+  </div>
+
+  <div class="about-visual fade-up">
+    <div class="stat-box">
+      <div class="stat-number">3<span>+</span></div>
+      <div class="stat-label">Years in Production</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Specialist Artists</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">4</div>
+      <div class="stat-label">Core Services</div>
+    </div>
+    <div class="stat-box accent-box">
+      <div class="stat-number">100<span>%</span></div>
+      <div class="stat-label">Client Satisfaction — Our Only Standard</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div id="services">
+  <div class="services-header fade-up">
+    <div>
+      <div class="section-label">What We Offer</div>
+      <h2 class="section-title">Full-pipeline<br>comic production.</h2>
+    </div>
+    <p class="services-desc">
+      Whether you need a single chapter colored or an entire webtoon directed from scratch — Illugo has the skill and dedication to see it through.
+    </p>
+  </div>
+
+  <div class="services-grid fade-up">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-icon">✏️</div>
+      <div class="service-name">Illustration & Line Art</div>
+      <p class="service-desc">Character-driven artwork with clean, expressive linework. Manga and manhwa style — built for webtoon format.</p>
+      <span class="service-tag">Manga · Manhwa</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-icon">🎨</div>
+      <div class="service-name">Professional Coloring</div>
+      <p class="service-desc">Flat coloring, cel shading, and full rendering. We match your preferred palette, mood, and visual identity.</p>
+      <span class="service-tag">Flat · Cel · Full Render</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-icon">📋</div>
+      <div class="service-name">Storyboarding</div>
+      <p class="service-desc">Panel composition and visual flow — from rough thumbnails to presentation-ready boards for any platform.</p>
+      <span class="service-tag">Thumbnails · Layouts</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-num">04</div>
+      <div class="service-icon">🎯</div>
+      <div class="service-name">Art Direction</div>
+      <p class="service-desc">Visual consistency across your entire project. We ensure every page feels cohesive, intentional, and on-brand.</p>
+      <span class="service-tag">Style Guide · Consistency</span>
+    </div>
+  </div>
+
+  <p style="margin-top:1.5rem; font-size:0.78rem; color:rgba(245,240,232,0.3); letter-spacing:0.05em;">
+    * Western comic illustration also available — samples provided upon request.
+  </p>
+</div>
+
+<!-- PORTFOLIO -->
+<div id="portfolio">
+  <div class="portfolio-header fade-up">
+    <div>
+      <div class="section-label">Our Work</div>
+      <h2 class="section-title">Selected Projects</h2>
+    </div>
+    <div class="portfolio-filter">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="coloring">Coloring</button>
+      <button class="filter-btn" data-filter="lineart">Line Art</button>
+      <button class="filter-btn" data-filter="storyboard">Storyboard</button>
+      <button class="filter-btn" data-filter="chibi">Chibi</button>
+    </div>
+  </div>
+
+  <div class="portfolio-grid fade-up" id="portfolioGrid">
+
+    <!-- 1. Ne Zha -->
+    <div class="portfolio-item pf-featured" data-category="coloring" data-src="nezha.jpg" data-title="Ne Zha" data-cat="Full Color Illustration · Manga Style">
+      <img src="nezha.jpg" alt="Ne Zha" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Ne Zha</div>
+        <div class="portfolio-cat">Full Color Illustration · Manga Style</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 2. Dante -->
+    <div class="portfolio-item" data-category="coloring" data-src="dante.jpg" data-title="Dante — Devil May Cry" data-cat="Full Color · Character Illustration">
+      <img src="dante.jpg" alt="Dante" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Dante — Devil May Cry</div>
+        <div class="portfolio-cat">Full Color · Character Illustration</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 3. Penebang Pohon -->
+    <div class="portfolio-item" data-category="lineart" data-src="penebang.jpg" data-title="Penebang Pohon" data-cat="Line Art · Dramatic Lighting">
+      <img src="penebang.jpg" alt="Penebang Pohon" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Penebang Pohon</div>
+        <div class="portfolio-cat">Line Art · Dramatic Lighting</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 4. Cowok ku -->
+    <div class="portfolio-item" data-category="coloring" data-src="cowokku.jpg" data-title="Cowok ku Seorang Player" data-cat="Webtoon Coloring · Manhwa Style">
+      <img src="cowokku.jpg" alt="Cowok ku Seorang Player" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Cowok ku Seorang Player</div>
+        <div class="portfolio-cat">Webtoon Coloring · Manhwa Style</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 5. Komik Inking 1 -->
+    <div class="portfolio-item" data-category="lineart" data-src="komik-inking-1.jpg" data-title="Comic Page — Environment" data-cat="Line Art · Full Inking">
+      <img src="komik-inking-1.jpg" alt="Comic Page Environment" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Comic Page — Environment</div>
+        <div class="portfolio-cat">Line Art · Full Inking</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 6. Komik Inking 2 -->
+    <div class="portfolio-item" data-category="storyboard" data-src="komik-inking-2.jpg" data-title="Comic Page — Action Scene" data-cat="Line Art · Inking · Storyboard">
+      <img src="komik-inking-2.jpg" alt="Comic Page Action" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Comic Page — Action Scene</div>
+        <div class="portfolio-cat">Line Art · Inking · Storyboard</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 7. War Scene -->
+    <div class="portfolio-item" data-category="coloring" data-src="war-scene.jpg" data-title="War — Burning City" data-cat="Environment · Full Color">
+      <img src="war-scene.jpg" alt="War Scene" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">War — Burning City</div>
+        <div class="portfolio-cat">Environment · Full Color</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 8. Penebang Pohon halaman komik -->
+    <div class="portfolio-item" data-category="lineart" data-src="penebang-page.jpg" data-title="Penebang Pohon — Comic Page" data-cat="Line Art · Comic Page · Manga Style">
+      <img src="penebang-page.jpg" alt="Penebang Pohon Comic Page" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Penebang Pohon — Comic Page</div>
+        <div class="portfolio-cat">Line Art · Comic Page · Manga Style</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 9. Malam di perahu -->
+    <div class="portfolio-item pf-featured" data-category="lineart" data-src="malam-perahu.jpg" data-title="Hantu Pulau Rawa" data-cat="Full Render · Atmospheric · Comic Page">
+      <img src="malam-perahu.jpg" alt="Hantu Pulau Rawa" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Hantu Pulau Rawa</div>
+        <div class="portfolio-cat">Full Render · Atmospheric · Comic Page</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 10. Warrior character -->
+    <div class="portfolio-item" data-category="coloring" data-src="warrior.jpg" data-title="Warrior Character" data-cat="Character Design · Full Color">
+      <img src="warrior.jpg" alt="Warrior Character" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Warrior Character</div>
+        <div class="portfolio-cat">Character Design · Full Color</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 11. Man reading -->
+    <div class="portfolio-item" data-category="coloring" data-src="man-reading.jpg" data-title="Peaceful Afternoon" data-cat="Character Illustration · Full Color">
+      <img src="man-reading.jpg" alt="Man Reading" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Peaceful Afternoon</div>
+        <div class="portfolio-cat">Character Illustration · Full Color</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 12. Bird Ornament -->
+    <div class="portfolio-item" data-category="lineart" data-src="bird-ornament.jpg" data-title="Ornamental Bird" data-cat="Line Art · Decorative · Traditional Pattern">
+      <img src="bird-ornament.jpg" alt="Ornamental Bird" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Ornamental Bird</div>
+        <div class="portfolio-cat">Line Art · Decorative · Traditional Pattern</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 13. Chibi girl -->
+    <div class="portfolio-item" data-category="chibi" data-src="chibi-girl.jpg" data-title="Chibi Character" data-cat="Chibi · Character Design · Full Color">
+      <img src="chibi-girl.jpg" alt="Chibi Girl" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Chibi Character</div>
+        <div class="portfolio-cat">Chibi · Character Design · Full Color</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+    <!-- 14. Chibi snail -->
+    <div class="portfolio-item" data-category="chibi" data-src="chibi-snail.jpg" data-title="Snail & Friend" data-cat="Chibi · Illustration · Full Color">
+      <img src="chibi-snail.jpg" alt="Chibi Snail" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+      <div class="portfolio-overlay">
+        <div class="portfolio-title">Snail & Friend</div>
+        <div class="portfolio-cat">Chibi · Illustration · Full Color</div>
+        <div class="pf-zoom">🔍 View</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; align-items:center; justify-content:center; flex-direction:column; padding:2rem;">
+    <button id="lbClose" style="position:absolute; top:1.5rem; right:2rem; background:none; border:none; color:rgba(245,240,232,0.6); font-size:2rem; cursor:pointer; font-family:'DM Sans',sans-serif; line-height:1;">✕</button>
+    <button id="lbPrev" style="position:absolute; left:1.5rem; top:50%; transform:translateY(-50%); background:rgba(245,240,232,0.08); border:1px solid rgba(245,240,232,0.15); color:var(--paper); width:44px; height:44px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center;">‹</button>
+    <button id="lbNext" style="position:absolute; right:1.5rem; top:50%; transform:translateY(-50%); background:rgba(245,240,232,0.08); border:1px solid rgba(245,240,232,0.15); color:var(--paper); width:44px; height:44px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center;">›</button>
+    <img id="lbImg" src="" alt="" style="max-width:85vw; max-height:80vh; object-fit:contain; border-radius:2px;">
+    <div style="margin-top:1.2rem; text-align:center;">
+      <div id="lbTitle" style="font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--paper); margin-bottom:0.3rem;"></div>
+      <div id="lbCat" style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent);"></div>
+    </div>
+    <div id="lbCounter" style="position:absolute; bottom:1.5rem; font-size:0.72rem; letter-spacing:0.1em; color:rgba(245,240,232,0.3);"></div>
+  </div>
+
+</div>
+
+<style>
+  /* Portfolio grid update */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+  }
+
+  .pf-featured {
+    grid-column: 1 / 3;
+    aspect-ratio: 16/9 !important;
+  }
+
+  .portfolio-item {
+    aspect-ratio: 3/4;
+    cursor: pointer;
+  }
+
+  .pf-zoom {
+    margin-top: 0.6rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.5);
+    text-transform: uppercase;
+  }
+
+  /* Filter animation */
+  .portfolio-item.hidden {
+    display: none;
+  }
+
+  .portfolio-item.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+<script>
+  // Tab Filter
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const items = document.querySelectorAll('.portfolio-item');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter;
+
+      // Remove featured span when filtering
+      items.forEach(item => {
+        const match = filter === 'all' || item.dataset.category === filter;
+        item.classList.toggle('hidden', !match);
+        if (match) {
+          item.classList.add('fade-in');
+          setTimeout(() => item.classList.remove('fade-in'), 300);
+        }
+        // Only apply featured grid span on "all"
+        if (item.classList.contains('pf-featured')) {
+          item.style.gridColumn = filter === 'all' ? '1 / 3' : '';
+          item.style.aspectRatio = filter === 'all' ? '16/9' : '3/4';
+        }
+      });
+    });
+  });
+
+  // Lightbox
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbCat = document.getElementById('lbCat');
+  const lbCounter = document.getElementById('lbCounter');
+
+  let currentIndex = 0;
+  let visibleItems = [];
+
+  function openLightbox(index) {
+    visibleItems = [...document.querySelectorAll('.portfolio-item:not(.hidden)')];
+    currentIndex = index;
+    updateLightbox();
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function updateLightbox() {
+    const item = visibleItems[currentIndex];
+    lbImg.src = item.dataset.src;
+    lbTitle.textContent = item.dataset.title;
+    lbCat.textContent = item.dataset.cat;
+    lbCounter.textContent = (currentIndex + 1) + ' / ' + visibleItems.length;
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  items.forEach((item, i) => {
+    item.addEventListener('click', () => {
+      visibleItems = [...document.querySelectorAll('.portfolio-item:not(.hidden)')];
+      const visibleIndex = visibleItems.indexOf(item);
+      openLightbox(visibleIndex);
+    });
+  });
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+
+  document.getElementById('lbPrev').addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+    updateLightbox();
+  });
+
+  document.getElementById('lbNext').addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % visibleItems.length;
+    updateLightbox();
+  });
+
+  // Close on backdrop click
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.style.display === 'flex') {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % visibleItems.length; updateLightbox(); }
+      if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length; updateLightbox(); }
+    }
+  });
+</script>
+
+<!-- OUR COMICS -->
+<div id="comics" style="border-top: 1px solid rgba(245,240,232,0.08); padding: 7rem 4rem; max-width: 1200px; margin: 0 auto;">
+
+  <div class="fade-up" style="margin-bottom: 4rem;">
+    <div class="section-label">Our Comics</div>
+    <h2 class="section-title">Stories We Tell</h2>
+    <p style="color:rgba(245,240,232,0.5); font-size:0.95rem; max-width:500px; line-height:1.8; margin-top:0.8rem;">Baca beberapa halaman pertama gratis — dukung cerita lengkapnya di Trakteer.</p>
+  </div>
+
+  <div class="fade-up" style="display:grid; grid-template-columns: repeat(2,1fr); gap: 3px;">
+
+    <!-- Carpenter : Detrucante -->
+    <div style="background:var(--light-ink); border:1px solid rgba(245,240,232,0.06); overflow:hidden; cursor:pointer;" onclick="openReader('carpenter')">
+      <div style="aspect-ratio:3/4; position:relative; overflow:hidden;">
+        <img src="carpenter-cover.jpg" alt="Carpenter Detrucante" style="width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,1) 0%, transparent 50%);"></div>
+        <div style="position:absolute; top:1rem; left:1rem; background:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:0.65rem; letter-spacing:0.15em; padding:0.3rem 0.7rem; border-radius:2px;">New</div>
+        <div style="position:absolute; top:1rem; right:1rem; background:rgba(0,0,0,0.7); border:1px solid rgba(245,240,232,0.15); font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.3rem 0.6rem; border-radius:2px; color:rgba(245,240,232,0.7);">5 halaman gratis</div>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; background:rgba(0,0,0,0.5);" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+          <div style="background:var(--accent); color:white; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.2em; padding:0.8rem 2rem; border-radius:2px;">▶ BACA PREVIEW</div>
+        </div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:0.4rem;">Action · Horror · Drama</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--paper); margin-bottom:0.6rem;">Carpenter : Detrucante</div>
+        <p style="font-size:0.82rem; color:rgba(245,240,232,0.5); line-height:1.7; margin-bottom:1.2rem;">Pak Puji tidak meminta ditemani. Tapi seseorang datang, menawarkan bantuan dengan senyum yang terlalu tenang.<br><br>Di antara bunyi kapak dan darah yang meresap ke tanah, satu pertanyaan terus menghantuinya — siapa sebenarnya yang berdiri di sampingnya?</p>
+        <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+          <div onclick="openReader('carpenter')" style="background:var(--accent); color:var(--paper); padding:0.7rem 1.4rem; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; border-radius:2px; cursor:pointer;">▶ Baca Preview</div>
+          <a href="https://trakteer.id/illugoworks" target="_blank" style="border:1px solid rgba(245,240,232,0.2); color:rgba(245,240,232,0.6); padding:0.7rem 1.4rem; text-decoration:none; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; border-radius:2px;">Beli di Trakteer — Rp 10.000</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hantu Pulau Rawa -->
+    <div style="background:var(--light-ink); border:1px solid rgba(245,240,232,0.06); overflow:hidden; cursor:pointer;" onclick="openReader('hantu')">
+      <div style="aspect-ratio:3/4; position:relative; overflow:hidden;">
+        <img src="hantu-cover.jpg" alt="Hantu Pulau Rawa" style="width:100%; height:100%; object-fit:cover; object-position:center top; transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,1) 0%, transparent 50%);"></div>
+        <div style="position:absolute; top:1rem; left:1rem; background:var(--gold); font-family:'Bebas Neue',sans-serif; font-size:0.65rem; letter-spacing:0.15em; padding:0.3rem 0.7rem; border-radius:2px; color:#1a1500;">New</div>
+        <div style="position:absolute; top:1rem; right:1rem; background:rgba(0,0,0,0.7); border:1px solid rgba(245,240,232,0.15); font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.3rem 0.6rem; border-radius:2px; color:rgba(245,240,232,0.7);">5 halaman gratis</div>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; background:rgba(0,0,0,0.5);" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+          <div style="background:var(--gold); color:#1a1500; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.2em; padding:0.8rem 2rem; border-radius:2px;">▶ BACA PREVIEW</div>
+        </div>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:0.4rem;">Mystery · Folklore · Horror</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--paper); margin-bottom:0.6rem;">Hantu Pulau Rawa</div>
+        <p style="font-size:0.82rem; color:rgba(245,240,232,0.5); line-height:1.7; margin-bottom:1.2rem;">Ia masuk ke hutan untuk mencari kayu. Yang ditemukannya adalah jalan yang tidak bisa ia putar balik.<br><br>Di rawa itu, yang hilang tidak selalu mati. Kadang mereka hanya... berpindah.</p>
+        <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+          <div onclick="openReader('hantu')" style="background:var(--gold); color:#1a1500; padding:0.7rem 1.4rem; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; border-radius:2px; cursor:pointer;">▶ Baca Preview</div>
+          <a href="https://trakteer.id/illugoworks" target="_blank" style="border:1px solid rgba(245,240,232,0.2); color:rgba(245,240,232,0.6); padding:0.7rem 1.4rem; text-decoration:none; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; border-radius:2px;">Beli di Trakteer — Rp 10.000</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Trakteer CTA -->
+  <div class="fade-up" style="margin-top:2rem; text-align:center; padding:2rem; border:1px solid rgba(245,240,232,0.07); border-radius:2px; background:var(--light-ink);">
+    <p style="font-size:0.78rem; color:rgba(245,240,232,0.4); margin-bottom:1rem; letter-spacing:0.05em;">Dukung Illugo dan baca chapter lengkap di Trakteer</p>
+    <a href="https://trakteer.id/illugoworks" target="_blank" style="display:inline-flex; align-items:center; gap:0.6rem; background:var(--accent); color:var(--paper); padding:0.85rem 2rem; text-decoration:none; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; border-radius:2px;">🎨 Kunjungi Trakteer Illugo →</a>
+  </div>
+
+</div>
+
+<!-- COMIC READER OVERLAY -->
+<div id="comicReader" style="display:none; position:fixed; inset:0; background:#000; z-index:500; flex-direction:column; overflow:hidden;">
+
+  <!-- Reader Header -->
+  <div style="background:rgba(10,10,10,0.97); backdrop-filter:blur(10px); border-bottom:1px solid rgba(245,240,232,0.08); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; position:relative; z-index:2;">
+    <div>
+      <div id="readerTitle" style="font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--paper);"></div>
+      <div id="readerSub" style="font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(245,240,232,0.3); margin-top:2px;">Preview Gratis</div>
+    </div>
+    <button onclick="closeReader()" style="background:rgba(245,240,232,0.08); border:1px solid rgba(245,240,232,0.15); color:var(--paper); width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:1rem; line-height:1;">✕</button>
+  </div>
+
+  <!-- Reader scroll body -->
+  <div id="readerBody" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; align-items:center; background:#0a0a0a; padding:2rem 1rem 0;"></div>
+
+</div>
+
+<script>
+  const comicData = {
+    carpenter: {
+      title: 'Carpenter : Detrucante',
+      pages: [
+        'carpenter-cover.png',
+        'carpenter-p1.png',
+        'carpenter-p2.png',
+        'carpenter-p3.png',
+        'carpenter-p4.png',
+        'carpenter-p5.png',
+      ]
+    },
+    hantu: {
+      title: 'Hantu Pulau Rawa',
+      pages: [
+        'hantu-cover.png',
+        'hantu-p2.png',
+        'hantu-p1.png',
+        'hantu-p3.png',
+        'hantu-p4.png',
+        'hantu-p5.png',
+      ]
+    }
+  };
+
+  function openReader(id) {
+    const comic = comicData[id];
+    if (!comic) return;
+
+    const reader = document.getElementById('comicReader');
+    const body = document.getElementById('readerBody');
+    document.getElementById('readerTitle').textContent = comic.title;
+    body.innerHTML = '';
+
+    // Pages
+    comic.pages.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'Halaman ' + (i + 1);
+      img.style.cssText = 'max-width:680px; width:100%; display:block; margin-bottom:4px;';
+      body.appendChild(img);
+    });
+
+    // Paywall end card
+    const pw = document.createElement('div');
+    pw.style.cssText = 'max-width:680px; width:100%; background:linear-gradient(135deg,#1a0a0a,#0a0a0a); border:1px solid rgba(200,57,43,0.3); padding:3rem 2rem; text-align:center; margin:2rem 0 4rem;';
+    pw.innerHTML = `
+      <div style="font-size:2rem; margin-bottom:1rem;">📖</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:#f5f0e8; margin-bottom:0.6rem;">Ingin tahu kelanjutannya?</div>
+      <p style="font-size:0.85rem; color:rgba(245,240,232,0.5); margin-bottom:1.5rem; line-height:1.7;">Ini adalah akhir dari preview gratis.<br>Baca chapter lengkap di Trakteer dan dukung Illugo Studio!</p>
+      <a href="https://trakteer.id/illugoworks" target="_blank" style="display:inline-flex; align-items:center; gap:0.6rem; background:#c8392b; color:white; padding:0.9rem 2rem; text-decoration:none; font-size:0.82rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:500; border-radius:2px; margin-bottom:0.8rem;">Beli Chapter Penuh — Rp 10.000 →</a><br>
+      <button onclick="closeReader()" style="background:transparent; border:1px solid rgba(245,240,232,0.2); color:rgba(245,240,232,0.5); padding:0.7rem 1.5rem; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; font-family:'DM Sans',sans-serif; margin-top:0.8rem;">← Kembali</button>
+    `;
+    body.appendChild(pw);
+
+    reader.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    body.scrollTop = 0;
+  }
+
+  function closeReader() {
+    document.getElementById('comicReader').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeReader();
+  });
+</script>
+
+<!-- MEET THE TEAM -->
+<div id="team" style="border-top: 1px solid rgba(245,240,232,0.08); padding: 7rem 4rem; max-width: 1200px; margin: 0 auto;">
+  <div class="fade-up" style="text-align:center; margin-bottom: 4rem;">
+    <div class="section-label" style="justify-content:center;">The People Behind the Panels</div>
+    <h2 class="section-title" style="font-size: clamp(2rem, 3.5vw, 3rem);">Meet the Team</h2>
+    <p style="color:rgba(245,240,232,0.5); font-size:0.95rem; margin-top:0.8rem; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.8;">A tight-knit crew of dedicated artists — small by design, exceptional by standard.</p>
+  </div>
+
+  <div class="fade-up" style="display:grid; grid-template-columns: repeat(3,1fr); gap: 2px;">
+
+    <!-- Korzak -->
+    <div style="background:var(--light-ink); border:1px solid rgba(245,240,232,0.06); padding:2.5rem 2rem; position:relative; transition: background 0.3s;" onmouseover="this.style.background='#231f1a'" onmouseout="this.style.background='var(--light-ink)'">
+      <div style="position:relative; width:80px; height:80px; margin-bottom:1.5rem;">
+        <div style="width:80px; height:80px; border-radius:50%; border:2px solid rgba(245,240,232,0.15); position:absolute; animation: spin 12s linear infinite;"></div>
+        <div style="width:72px; height:72px; border-radius:50%; background: linear-gradient(135deg, #1e1a16, #2a2420); display:flex; align-items:center; justify-content:center; position:absolute; top:4px; left:4px;">
+          <span style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--paper);">K</span>
+        </div>
+        <div style="position:absolute; bottom:-4px; right:-4px; background:var(--accent); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:0.65rem; color:white;">01</div>
+      </div>
+      <div style="font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:0.3rem; font-weight:500;">Storyboarding</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--paper); margin-bottom:0.8rem;">Korzak</div>
+      <p style="font-size:0.85rem; color:rgba(245,240,232,0.5); line-height:1.75; margin-bottom:1.2rem;">The architect of every story. Korzak transforms raw narratives into dynamic panel compositions — crafting visual flow that keeps readers turning pages.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(245,240,232,0.12); padding:0.3rem 0.6rem; color:rgba(245,240,232,0.45); border-radius:2px;">Panel Layout</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(245,240,232,0.12); padding:0.3rem 0.6rem; color:rgba(245,240,232,0.45); border-radius:2px;">Visual Flow</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(245,240,232,0.12); padding:0.3rem 0.6rem; color:rgba(245,240,232,0.45); border-radius:2px;">Thumbnailing</span>
+      </div>
+    </div>
+
+    <!-- Goresan -->
+    <div style="background:var(--light-ink); border:1px solid rgba(245,240,232,0.06); padding:2.5rem 2rem; position:relative; transition: background 0.3s;" onmouseover="this.style.background='#231f1a'" onmouseout="this.style.background='var(--light-ink)'">
+      <div style="position:relative; width:80px; height:80px; margin-bottom:1.5rem;">
+        <div style="width:80px; height:80px; border-radius:50%; border:2px solid rgba(200,57,43,0.35); position:absolute; animation: spin 12s linear infinite reverse;"></div>
+        <div style="width:72px; height:72px; border-radius:50%; background: linear-gradient(135deg, #2a1510, #1e0d0a); display:flex; align-items:center; justify-content:center; position:absolute; top:4px; left:4px;">
+          <span style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--accent);">G</span>
+        </div>
+        <div style="position:absolute; bottom:-4px; right:-4px; background:var(--accent); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:0.65rem; color:white;">02</div>
+      </div>
+      <div style="font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:0.3rem; font-weight:500;">Line Art</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--paper); margin-bottom:0.8rem;">Goresan</div>
+      <p style="font-size:0.85rem; color:rgba(245,240,232,0.5); line-height:1.75; margin-bottom:1.2rem;">Every line is intentional. Goresan brings characters to life with expressive, clean linework — mastering both manga and manhwa aesthetics with precision.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(200,57,43,0.25); padding:0.3rem 0.6rem; color:rgba(200,57,43,0.7); border-radius:2px;">Character Design</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(200,57,43,0.25); padding:0.3rem 0.6rem; color:rgba(200,57,43,0.7); border-radius:2px;">Manga</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(200,57,43,0.25); padding:0.3rem 0.6rem; color:rgba(200,57,43,0.7); border-radius:2px;">Manhwa</span>
+      </div>
+    </div>
+
+    <!-- Srdwou -->
+    <div style="background:var(--light-ink); border:1px solid rgba(245,240,232,0.06); padding:2.5rem 2rem; position:relative; transition: background 0.3s;" onmouseover="this.style.background='#231f1a'" onmouseout="this.style.background='var(--light-ink)'">
+      <div style="position:relative; width:80px; height:80px; margin-bottom:1.5rem;">
+        <div style="width:80px; height:80px; border-radius:50%; border:2px solid rgba(201,168,76,0.35); position:absolute; animation: spin 14s linear infinite;"></div>
+        <div style="width:72px; height:72px; border-radius:50%; background: linear-gradient(135deg, #1e1a08, #2a2410); display:flex; align-items:center; justify-content:center; position:absolute; top:4px; left:4px;">
+          <span style="font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--gold);">S</span>
+        </div>
+        <div style="position:absolute; bottom:-4px; right:-4px; background:var(--gold); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:0.65rem; color:#1a1500;">03</div>
+      </div>
+      <div style="font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:0.3rem; font-weight:500;">Inking & Coloring</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--paper); margin-bottom:0.8rem;">Srdwou</div>
+      <p style="font-size:0.85rem; color:rgba(245,240,232,0.5); line-height:1.75; margin-bottom:1.2rem;">Where line meets color. Srdwou refines every stroke with precise inking and breathes life into each page — from flat tones to full cinematic renders.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(201,168,76,0.25); padding:0.3rem 0.6rem; color:rgba(201,168,76,0.7); border-radius:2px;">Inking</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(201,168,76,0.25); padding:0.3rem 0.6rem; color:rgba(201,168,76,0.7); border-radius:2px;">Cel Shading</span>
+        <span style="font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid rgba(201,168,76,0.25); padding:0.3rem 0.6rem; color:rgba(201,168,76,0.7); border-radius:2px;">Full Render</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Avatar note -->
+  <div class="fade-up" style="margin-top:2rem; text-align:center; padding:1.2rem 2rem; border:1px dashed rgba(245,240,232,0.1); border-radius:2px; display:flex; align-items:center; justify-content:center; gap:0.8rem;">
+    <span style="font-size:1rem;">🎨</span>
+    <p style="font-size:0.78rem; color:rgba(245,240,232,0.3); letter-spacing:0.05em;">Avatar portraits — original character illustrations by each artist — coming soon.</p>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+
+<!-- CONTACT -->
+<div id="contact">
+  <div class="contact-left fade-up">
+    <div class="section-label">Get In Touch</div>
+    <h2 class="section-title">Let's tell your story together.</h2>
+    <p>Have a story to tell? We'd love to hear it. Reach out through any channel — we respond within 48 hours.</p>
+    <div class="contact-links">
+      <a href="mailto:illugoworks@gmail.com" class="contact-link">
+        <div class="contact-link-icon">✉</div>
+        illugoworks@gmail.com
+      </a>
+      <a href="https://instagram.com/illugoworks" target="_blank" class="contact-link">
+        <div class="contact-link-icon">📸</div>
+        @illugoworks
+      </a>
+      <a href="https://x.com/illugoworks" target="_blank" class="contact-link">
+        <div class="contact-link-icon">🐦</div>
+        @illugoworks
+      </a>
+    </div>
+  </div>
+
+  <div class="contact-right fade-up">
+    <div class="contact-status">
+      <div class="status-dot" style="background:#e08c00;"></div>
+      Commissions currently closed
+    </div>
+
+    <div class="contact-field">
+      <label>Your Name</label>
+      <input type="text" placeholder="e.g. Kim Jisoo">
+    </div>
+    <div class="contact-field">
+      <label>Email</label>
+      <input type="email" placeholder="you@example.com">
+    </div>
+    <div class="contact-field">
+      <label>Service Needed</label>
+      <select>
+        <option>Illustration & Line Art</option>
+        <option>Professional Coloring</option>
+        <option>Storyboarding</option>
+        <option>Art Direction</option>
+        <option>Full Production</option>
+      </select>
+    </div>
+    <div class="contact-field">
+      <label>Tell us about your project</label>
+      <textarea placeholder="Brief description of your story, style reference, deadline..."></textarea>
+    </div>
+    <button class="btn-submit">Send Inquiry →</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">ILLU<span>GO</span></div>
+  <div class="footer-copy">© 2026 Illugo Studio. All rights reserved.</div>
+  <div class="footer-socials">
+    <a href="https://instagram.com/illugoworks" target="_blank">Instagram</a>
+    <a href="https://x.com/illugoworks" target="_blank">X</a>
+    <a href="mailto:illugoworks@gmail.com">Email</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Portfolio filter (UI only)
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
